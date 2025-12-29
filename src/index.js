@@ -5,8 +5,12 @@ const { updateSentStatus } = require("../scripts/phase4");
 const path = require("path");
 
 async function main() {
-  const filePath = path.join(__dirname, "..", "hr_list.xlsx");
+  const filePath = path.join(__dirname, "..", "data.xlsx");
   const resumePath = path.join(__dirname, "..", "resume.pdf");
+
+  // Load passwords from env
+  const openPassword = process.env.XLSX_OPEN_PASSWORD;
+  const editPassword = process.env.XLSX_EDIT_PASSWORD;
 
   // Subject and body - update as needed
   const subject = "Job Application"; // Replace with actual subject
@@ -14,7 +18,7 @@ async function main() {
 
   try {
     // Phase 1: Load unsent emails
-    const unsentEmails = loadUnsentEmails(filePath);
+    const unsentEmails = loadUnsentEmails(filePath, openPassword, editPassword);
     console.log(`Found ${unsentEmails.length} unsent emails`);
 
     // Phase 2: Prepare batches
@@ -29,7 +33,7 @@ async function main() {
       const sentEmails = await sendEmails(batch, subject, body, resumePath);
 
       // Phase 4: Update sent status
-      updateSentStatus(filePath, sentEmails);
+      updateSentStatus(filePath, sentEmails, editPassword);
 
       // Optional: Delay between batches to avoid rate limits
       await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 second delay

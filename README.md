@@ -14,9 +14,9 @@ This project is designed to send batch emails to a list of HR contacts from an X
 ## Setup
 
 1. Install dependencies: `npm install`
-2. Place your HR list XLSX file in the root directory (e.g., `hr_list.xlsx`)
-3. Place your resume file in the root directory (e.g., `resume.pdf`)
-4. Copy `.env.example` to `.env` and configure your SMTP settings
+2. Place your XLSX file as `data.xlsx` in the root directory (must have 'email' and 'sent_status' columns)
+3. Place your resume as `resume.pdf` in the root directory
+4. Copy `.env.example` to `.env` and configure your email credentials and XLSX passwords
 5. Update subject and body in `src/index.js` as needed
 
 ### SMTP Configuration
@@ -26,6 +26,12 @@ This project uses Gmail SMTP. To avoid security issues:
 1. Enable 2-Factor Authentication on your Gmail account
 2. Generate an App Password: Go to Google Account settings > Security > App passwords
 3. Use your Gmail address as EMAIL_USER and the app password as EMAIL_PASS
+
+### XLSX Passwords
+
+If your `data.xlsx` file is password-protected:
+- XLSX_OPEN_PASSWORD: Password to open/read the file
+- XLSX_EDIT_PASSWORD: Password to edit/write to the file
 
 **Note**: Gmail may still flag bulk emails. If you encounter issues, consider using SendGrid or another transactional email service.
 
