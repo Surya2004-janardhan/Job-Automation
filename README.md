@@ -16,8 +16,14 @@ This project is designed to send batch emails to a list of HR contacts from an X
 1. Install dependencies: `npm install`
 2. Place your HR list XLSX file in the root directory (e.g., `hr_list.xlsx`)
 3. Place your resume file in the root directory (e.g., `resume.pdf`)
-4. Configure SMTP settings in `.env` file
-5. Update subject and body in the code as needed
+4. Copy `.env.example` to `.env` and configure your SMTP settings
+5. Update subject and body in `src/index.js` as needed
+
+### SMTP Configuration
+
+For Gmail, use an app password instead of your regular password to avoid security flags. Enable 2FA and generate an app password.
+
+For better deliverability and to avoid spam flags, consider using a service like SendGrid, Mailgun, or AWS SES. Update the transporter configuration in `scripts/phase3.js` accordingly.
 
 ## Usage
 
