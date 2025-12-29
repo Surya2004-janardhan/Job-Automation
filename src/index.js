@@ -13,13 +13,25 @@ async function main() {
   const editPassword = process.env.XLSX_EDIT_PASSWORD;
 
   // Subject and body - update as needed
-  const subject = "Job Application"; // Replace with actual subject
-  const body = ""; // Empty body as specified
+  const subject = "Seeking Opportunity in SDE / Full Stack / AI intern";
+  const body = `
+                Hi,
+
+                I enjoy solving problems and am looking for opportunities to work on real-world projects while growing as an engineer. I’ve attached my resume for any SDE / Full Stack / AI roles you might have.
+
+                Looking forward to contributing to your team.
+
+                Thanks & Regards,
+                Surya Janardhan`; 
 
   try {
     // Phase 1: Load unsent emails
-    const unsentEmails = loadUnsentEmails(filePath, openPassword, editPassword);
-    console.log(`Found ${unsentEmails.length} unsent emails`);
+    const allUnsentEmails = loadUnsentEmails(filePath, openPassword, editPassword);
+    console.log(`Found ${allUnsentEmails.length} unsent emails`);
+
+    // Limit to 500 emails per run
+    const unsentEmails = allUnsentEmails.slice(0, 500);
+    console.log(`Processing ${unsentEmails.length} emails this run`);
 
     // Phase 2: Prepare batches
     const batches = prepareBatches(unsentEmails);
