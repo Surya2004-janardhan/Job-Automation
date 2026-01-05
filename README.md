@@ -1,11 +1,11 @@
 # HR Email Sender
 
-This project is designed to send batch emails to a list of HR contacts from an XLSX file. It processes emails in batches of 50, sending BCC emails with a resume attachment, and updates the sent status in the XLSX file.
+This project is designed to send batch emails to a list of HR contacts from an XLSX file. It processes emails in batches of 100, sending BCC emails with a resume attachment, and updates the sent status in the XLSX file.
 
 ## Features
 
 - Modularized JavaScript code with async/sync functions
-- Batch processing: 50 emails per batch
+- Batch processing: 100 emails per batch
 - BCC sending to avoid recipient visibility
 - Resume attachment support
 - XLSX file reading and updating
@@ -42,7 +42,7 @@ Run the main script: `node src/index.js`
 ## Phases
 
 1. **Load Data**: Read and filter unsent emails from XLSX
-2. **Prepare Batches**: Group emails into batches of 50
+2. **Prepare Batches**: Group emails into batches of 100
 3. **Send Emails**: Send BCC emails with attachment
 4. **Update Data**: Mark sent emails in XLSX
 

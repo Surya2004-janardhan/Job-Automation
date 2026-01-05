@@ -25,8 +25,8 @@ Surya Janardhan`;
     const allUnsentEmails = await loadUnsentEmails(sheetLink);
     console.log(`Found ${allUnsentEmails.length} unsent emails`);
 
-    // Take only first 50 unsent emails for this run
-    const unsentEmails = allUnsentEmails.slice(0, 50);
+    // Take only first 100 unsent emails for this run
+    const unsentEmails = allUnsentEmails.slice(0, 100);
     console.log(`Processing ${unsentEmails.length} emails this run`);
 
     if (unsentEmails.length === 0) {
@@ -34,11 +34,11 @@ Surya Janardhan`;
       return;
     }
 
-    // Phase 2: Prepare single batch of 50
+    // Phase 2: Prepare single batch of 100
     const batches = prepareBatches(unsentEmails);
     console.log(`Prepared ${batches.length} batch(es)`);
 
-    // Process only the first batch (should be only one batch of 50)
+    // Process only the first batch (should be only one batch of 100)
     const batch = batches[0];
     console.log(`Processing batch of ${batch.length} emails`);
 
