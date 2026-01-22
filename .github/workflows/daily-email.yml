@@ -4,49 +4,47 @@ on:
   schedule:
     # Run at 8:00 AM and 8:00 PM UTC daily (adjust timezone as needed)
     - cron: "0 8 * * *" # 8:00 AM UTC only 30 per each time
-    - cron: "0 20 * * *" # 8:00 PM UTC only 30 per each time 
-    # to avoid spam filters and limits 
+    - cron: "0 20 * * *" # 8:00 PM UTC only 30 per each time
+    # to avoid spam filters and limits
     # - cron: "0 22 * * *" # 11 PM UTC setting for may be hopping for 50 more emails - making total of 150
     # - cron: "0 23 * * *" # setting for 200 mails target slipt into 4 x 50, success rate is 3/4
+  workflow_dispatch: # Allow manual triggering
 
-   workflow_dispatch: # Allow manual triggering
+jobs:
+  send-emails:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
- jobs:
-   send-emails:
-     runs-on: ubuntu-latest
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
 
-     steps:
-       - name: Checkout repository
-         uses: actions/checkout@v4
+      - name: Install dependencies
+        run: npm ci
 
-       - name: Setup Node.js
-         uses: actions/setup-node@v4
-         with:
-           node-version: "18"
-           cache: "npm"
+      - name: Create service account JSON file
+        run: |
+          cat > seismic-rarity-468405-j1-cd12fe29c298.json << 'EOF'
+          ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          EOF
 
-       - name: Install dependencies
-         run: npm ci
+      - name: Create .env file
+        run: |
+          echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" > .env
+          echo "EMAIL_PASS=${{ secrets.EMAIL_PASS }}" >> .env
+          echo "GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}" >> .env
 
-       - name: Create service account JSON file
-         run: |
-           cat > seismic-rarity-468405-j1-cd12fe29c298.json << 'EOF'
-           ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
-           EOF
+      - name: Run email campaign
+        run: node src/index.js
 
-       - name: Create .env file
-         run: |
-           echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" > .env
-           echo "EMAIL_PASS=${{ secrets.EMAIL_PASS }}" >> .env
-           echo "GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}" >> .env
-
-       - name: Run email campaign
-         run: node src/index.js
-
-       - name: Commit and push any changes (optional)
-         run: |
-           git config --local user.email "action@github.com"
-           git config --local user.name "GitHub Action"
-           git add .
-           git commit -m "Update sent status after email campaign" || echo "No changes to commit"
-           git push || echo "No changes to push"
+      - name: Commit and push any changes (optional)
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Update sent status after email campaign" || echo "No changes to commit"
+          git push || echo "No changes to push"
