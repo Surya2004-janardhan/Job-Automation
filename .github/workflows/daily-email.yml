@@ -31,6 +31,10 @@ jobs:
       - name: List files in workspace
         run: ls -l
 
+      - name: Print service account JSON (redacted)
+        run: |
+          cat seismic-rarity-468405-j1-cd12fe29c298.json | grep -v 'private_key'
+
       - name: Create .env file
         run: |
           echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" > .env
