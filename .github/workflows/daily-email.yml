@@ -41,5 +41,8 @@ jobs:
           echo "EMAIL_PASS=${{ secrets.EMAIL_PASS }}" >> .env
           echo "GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}" >> .env
 
+      - name: Set GOOGLE_APPLICATION_CREDENTIALS
+        run: echo "GOOGLE_APPLICATION_CREDENTIALS=$GITHUB_WORKSPACE/seismic-rarity-468405-j1-cd12fe29c298.json" >> $GITHUB_ENV
+
       - name: Run email campaign
         run: node src/index.js
