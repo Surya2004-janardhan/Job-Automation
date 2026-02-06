@@ -1,4 +1,4 @@
-name: LinkedIn Connection Automation
+name: LinkedIn Outreach Automation
 
 on:
   schedule:
@@ -6,9 +6,14 @@ on:
     - cron: "0 10 * * *"
 
   workflow_dispatch: # Allow manual triggering
+    inputs:
+      limit:
+        description: "Max messages to send (max 25/day)"
+        required: false
+        default: "20"
 
 jobs:
-  linkedin-connect:
+  linkedin-outreach:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,7 +31,7 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Install Chrome
+      - name: Setup Chrome
         uses: browser-actions/setup-chrome@latest
         with:
           chrome-version: stable
@@ -38,40 +43,88 @@ jobs:
       - name: Install Node dependencies
         run: npm install nodemailer
 
-      - name: Run LinkedIn Connection Automation
+      - name: Run LinkedIn Outreach
         id: linkedin
         run: |
           cd inb
-          python linkedin_selenium.py \
-            --email "ddrive600@gmail.com" \
-            --password "${{ secrets.LINKEDIN_PASSWORD }}" \
+          python linkedin_outreach.py \
+            --cookie "${{ secrets.LINKEDIN_COOKIE }}" \
             --excel "linkedin-data.xlsx" \
-            --limit 20 \
-            --message "Hi! I'm a motivated engineer seeking SDE/Full Stack/AI roles. I'd love to connect and explore opportunities. My resume: https://drive.google.com/file/d/14pEaC7-svetAUzXRZYsnM09cW3VzH2r2/view Thank you!" \
+            --limit ${{ github.event.inputs.limit || '20' }} \
+            --resume "https://drive.google.com/file/d/14pEaC7-svetAUzXRZYsnM09cW3VzH2r2/view" \
             --headless 2>&1 | tee linkedin_output.txt
         env:
-          LINKEDIN_PASSWORD: ${{ secrets.LINKEDIN_PASSWORD }}
+          LINKEDIN_COOKIE: ${{ secrets.LINKEDIN_COOKIE }}
         continue-on-error: true
 
-      - name: Commit updated Excel file
+      - name: Commit updated files
         if: always()
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add inb/linkedin-data.xlsx
-          git commit -m "Update LinkedIn status after automation run" || echo "No changes to commit"
+          git add inb/linkedin-data.xlsx inb/linkedin_quota.json
+          git commit -m "Update LinkedIn status - $(date +%Y-%m-%d)" || echo "No changes to commit"
           git push || echo "No changes to push"
 
       - name: Send SUCCESS notification email
         if: steps.linkedin.outcome == 'success'
-        run: node scripts/send-linkedin-notification.js success
+        run: |
+          node -e "
+          const nodemailer = require('nodemailer');
+          const fs = require('fs');
+
+          const output = fs.existsSync('inb/linkedin_output.txt') 
+            ? fs.readFileSync('inb/linkedin_output.txt', 'utf8').slice(-3000) 
+            : 'No output captured';
+
+          const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+          });
+
+          transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: 'chintalajanardhan2004@gmail.com',
+            subject: '✅ LinkedIn Outreach - Success',
+            html: \`
+              <h2>LinkedIn Outreach Completed</h2>
+              <p>Date: \${new Date().toISOString()}</p>
+              <pre style='background:#f4f4f4;padding:10px;'>\${output}</pre>
+            \`
+          }).then(() => console.log('Notification sent'));
+          "
         env:
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
 
       - name: Send FAILURE notification email
         if: steps.linkedin.outcome == 'failure'
-        run: node scripts/send-linkedin-notification.js failure
+        run: |
+          node -e "
+          const nodemailer = require('nodemailer');
+          const fs = require('fs');
+
+          const output = fs.existsSync('inb/linkedin_output.txt') 
+            ? fs.readFileSync('inb/linkedin_output.txt', 'utf8').slice(-3000) 
+            : 'No output captured';
+
+          const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+          });
+
+          transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: 'chintalajanardhan2004@gmail.com',
+            subject: '❌ LinkedIn Outreach - FAILED',
+            html: \`
+              <h2>LinkedIn Outreach Failed</h2>
+              <p>Date: \${new Date().toISOString()}</p>
+              <p>Please check the workflow logs.</p>
+              <pre style='background:#f4f4f4;padding:10px;'>\${output}</pre>
+            \`
+          }).then(() => console.log('Notification sent'));
+          "
         env:
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
