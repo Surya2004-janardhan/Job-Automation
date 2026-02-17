@@ -28,13 +28,13 @@ QUOTA_FILE = 'linkedin_quota.json'
 
 # Hardcoded resume link and message
 RESUME_LINK = "https://drive.google.com/file/d/1q45pza2gyP6Pf7z4kyQv2yvOY2KZtCZl/view?usp=sharing"
-DEFAULT_MESSAGE = f"""Hi! I'm Surya, a passionate Software Engineer with expertise in Full Stack, AI/ML, and LLMs.
+DEFAULT_MESSAGE = f"""Hi! I'm Surya, a Software Engineer with Full Stack, AI/ML & LLM expertise.
 
-I'm actively looking for SDE/Intern roles and would love to connect! If there are any openings, I'd really appreciate a referral.
+Looking for SDE/Intern roles. Would appreciate a referral if openings exist!
 
 Resume: {RESUME_LINK}
 
-Thank you! 🙏"""
+Thanks! 🙏"""
 # ===========================================
 
 
@@ -215,11 +215,7 @@ def send_direct_message(driver, public_id, message, debug=False):
     except Exception as e:
         return f'page_load_error: {str(e)[:50]}'
     
-<<<<<<< HEAD
-    time.sleep(random.uniform(4, 6))
-=======
     time.sleep(random.uniform(5, 7))  # Increased wait for page load
->>>>>>> 16535ebd49cf73db5da8ef39ece4e301b3c42490
     
     # DEBUG: Check page state
     if debug:
@@ -240,9 +236,6 @@ def send_direct_message(driver, public_id, message, debug=False):
     
     # Scroll to load content - more comprehensive
     try:
-<<<<<<< HEAD
-        driver.execute_script("window.scrollBy(0, 200)")
-=======
         # Scroll down to load lazy content
         driver.execute_script("window.scrollTo(0, 300)")
         time.sleep(1)
@@ -251,7 +244,6 @@ def send_direct_message(driver, public_id, message, debug=False):
         # Scroll back up to top section with action buttons
         driver.execute_script("window.scrollTo(0, 200)")
         time.sleep(1.5)
->>>>>>> 16535ebd49cf73db5da8ef39ece4e301b3c42490
     except:
         pass
     
@@ -265,13 +257,6 @@ def send_direct_message(driver, public_id, message, debug=False):
                 aria = (btn.get_attribute('aria-label') or '')[:40]
                 print(f"    - Text: '{txt}' | Aria: '{aria}'")
         
-<<<<<<< HEAD
-        # Find Message button
-        msg_button = None
-        
-        # Method 1: Message button with span text
-        buttons = driver.find_elements(By.XPATH, '//button[.//span[text()="Message"]]')
-=======
         # Check if already connected first
         if driver.find_elements(By.XPATH, '//button[.//span[text()="Message"]]'):
             return 'already_connected'
@@ -280,17 +265,14 @@ def send_direct_message(driver, public_id, message, debug=False):
         if driver.find_elements(By.XPATH, '//button[.//span[text()="Pending"]]'):
             return 'pending'
         
+        # Find Connect button
+        connect_button = None
+        
         # Method 1: Direct Connect button with aria-label containing "Invite"
         buttons = driver.find_elements(By.XPATH, '//button[contains(@aria-label, "Invite") and contains(@aria-label, "connect")]')
->>>>>>> 16535ebd49cf73db5da8ef39ece4e301b3c42490
         if buttons:
-            msg_button = buttons[0]
+            connect_button = buttons[0]
         
-<<<<<<< HEAD
-        # Method 2: aria-label containing "message"
-        if not msg_button:
-            buttons = driver.find_elements(By.XPATH, '//button[contains(@aria-label, "message") or contains(@aria-label, "Message")]')
-=======
         # Method 2: Button with specific aria-label patterns
         if not connect_button:
             buttons = driver.find_elements(By.CSS_SELECTOR, 'button[aria-label*="Invite"][aria-label*="to connect"]')
@@ -300,15 +282,9 @@ def send_direct_message(driver, public_id, message, debug=False):
         # Method 3: Connect button with exact span text
         if not connect_button:
             buttons = driver.find_elements(By.XPATH, '//button[.//span[text()="Connect"]]')
->>>>>>> 16535ebd49cf73db5da8ef39ece4e301b3c42490
             if buttons:
-                msg_button = buttons[0]
+                connect_button = buttons[0]
         
-<<<<<<< HEAD
-        # Method 3: Check More menu for Message option
-        if not msg_button:
-            more_buttons = driver.find_elements(By.XPATH, '//button[contains(@aria-label, "More")]')
-=======
         # Method 4: pvs-profile-actions class based selector (2024 LinkedIn UI)
         if not connect_button:
             buttons = driver.find_elements(By.CSS_SELECTOR, 'div.pvs-profile-actions button.pvs-profile-actions__action')
@@ -332,30 +308,12 @@ def send_direct_message(driver, public_id, message, debug=False):
             more_buttons = driver.find_elements(By.XPATH, '//button[contains(@aria-label, "More actions")]')
             if not more_buttons:
                 more_buttons = driver.find_elements(By.XPATH, '//button[contains(@aria-label, "More")]')
->>>>>>> 16535ebd49cf73db5da8ef39ece4e301b3c42490
             if not more_buttons:
                 more_buttons = driver.find_elements(By.XPATH, '//button[.//span[text()="More"]]')
             
             if more_buttons:
                 try:
                     driver.execute_script("arguments[0].click();", more_buttons[0])
-<<<<<<< HEAD
-                    time.sleep(1)
-                    menu_msg = driver.find_elements(By.XPATH, '//*[contains(@class, "dropdown")]//*[text()="Message"]/ancestor::*[1]')
-                    if menu_msg:
-                        driver.execute_script("arguments[0].click();", menu_msg[0])
-                        time.sleep(1)
-                        return _send_message_in_modal(driver, message)
-                except:
-                    pass
-        
-        if not msg_button:
-            # Check if we can connect instead
-            connect_btns = driver.find_elements(By.XPATH, '//button[.//span[text()="Connect"]]')
-            if connect_btns:
-                return 'not_connected'
-            return 'no_message_button'
-=======
                     time.sleep(2)
                     
                     # Find Connect in dropdown menu (updated selectors)
@@ -386,72 +344,31 @@ def send_direct_message(driver, public_id, message, debug=False):
                 elif btn_text == 'connect':
                     connect_button = btn
                     break
->>>>>>> 16535ebd49cf73db5da8ef39ece4e301b3c42490
         
-        # Click Message button
+        # Check if we found a Connect button
+        if not connect_button:
+            if driver.find_elements(By.XPATH, '//button[.//span[text()="Follow"]]'):
+                return 'follow_only'
+            return 'no_connect_button'
+        
+        # Click Connect button
         try:
-            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", msg_button)
+            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", connect_button)
             time.sleep(0.5)
-            driver.execute_script("arguments[0].click();", msg_button)
+            driver.execute_script("arguments[0].click();", connect_button)
         except Exception as e:
             return f'click_error: {str(e)[:50]}'
         
         time.sleep(1.5)
-        return _send_message_in_modal(driver, message)
+        return _handle_connect_modal(driver, message)
             
     except Exception as e:
         return f'error: {str(e)[:80]}'
 
 
-def _send_message_in_modal(driver, message):
-    """Type and send message in the message modal/composer."""
+def _handle_connect_modal(driver, message):
+    """Handle the connection request modal - add note and send."""
     try:
-<<<<<<< HEAD
-        time.sleep(1)
-        
-        # Find the message input area
-        msg_box = None
-        
-        # Method 1: contenteditable div (LinkedIn's rich text editor)
-        msg_boxes = driver.find_elements(By.XPATH, '//div[contains(@class, "msg-form__contenteditable")]')
-        if msg_boxes:
-            msg_box = msg_boxes[0]
-        
-        # Method 2: Any contenteditable in message form
-        if not msg_box:
-            msg_boxes = driver.find_elements(By.XPATH, '//div[@contenteditable="true" and contains(@class, "msg")]')
-            if msg_boxes:
-                msg_box = msg_boxes[0]
-        
-        # Method 3: Textarea fallback
-        if not msg_box:
-            msg_boxes = driver.find_elements(By.XPATH, '//textarea[contains(@name, "message") or contains(@class, "msg")]')
-            if msg_boxes:
-                msg_box = msg_boxes[0]
-        
-        # Method 4: Any contenteditable div in the modal
-        if not msg_box:
-            msg_boxes = driver.find_elements(By.XPATH, '//div[@contenteditable="true"]')
-            if msg_boxes:
-                msg_box = msg_boxes[-1]  # Usually the last one is the composer
-        
-        if not msg_box:
-            return 'no_message_box'
-        
-        # Click to focus and type message
-        msg_box.click()
-        time.sleep(0.3)
-        msg_box.send_keys(message)
-        time.sleep(0.5)
-        
-        # Find and click Send button
-        send_btn = None
-        
-        # Method 1: Send button with aria-label
-        send_btns = driver.find_elements(By.XPATH, '//button[contains(@aria-label, "Send")]')
-        if send_btns:
-            send_btn = send_btns[0]
-=======
         time.sleep(2)  # Increased wait for modal to fully load
         
         # Look for "Add a note" button - multiple patterns (2024 LinkedIn UI)
@@ -503,31 +420,10 @@ def _send_message_in_modal(driver, message):
             driver.execute_script("arguments[0].click();", send_btns[0])
             time.sleep(1.5)
             return 'sent'
->>>>>>> 16535ebd49cf73db5da8ef39ece4e301b3c42490
         
-        # Method 2: Send button text
-        if not send_btn:
-            send_btns = driver.find_elements(By.XPATH, '//button[.//span[text()="Send"]]')
-            if send_btns:
-                send_btn = send_btns[0]
-        
-        # Method 3: Button with type submit in message form
-        if not send_btn:
-            send_btns = driver.find_elements(By.XPATH, '//form[contains(@class, "msg")]//button[@type="submit"]')
-            if send_btns:
-                send_btn = send_btns[0]
-        
-        if not send_btn:
-            return 'no_send_button'
-        
-        driver.execute_script("arguments[0].click();", send_btn)
-        time.sleep(1)
-        
-        return 'sent'
+        return 'no_send_button'
         
     except Exception as e:
-<<<<<<< HEAD
-=======
         try:
             dismiss = driver.find_elements(By.XPATH, '//button[contains(@aria-label, "Dismiss")]')
             if not dismiss:
@@ -536,7 +432,6 @@ def _send_message_in_modal(driver, message):
                 dismiss[0].click()
         except:
             pass
->>>>>>> 16535ebd49cf73db5da8ef39ece4e301b3c42490
         return f'modal_error: {str(e)[:50]}'
 
 
