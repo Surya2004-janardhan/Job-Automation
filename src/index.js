@@ -64,8 +64,8 @@ Surya Janardhan
       console.log(`   Subject: "${subject.substring(0, 30)}..."`);
 
       // Phase 3: Send emails for this batch
-      const sentEmails = await sendEmails(batch, subject, body, resumeLink);
-      allSentEmails.push(...sentEmails);
+      const result = await sendEmails(batch, subject, body, resumeLink);
+      allSentEmails.push(...result.sentEmails);
 
       // Small delay between batches to avoid rate limiting
       if (i < batches.length - 1 && i < 4) {

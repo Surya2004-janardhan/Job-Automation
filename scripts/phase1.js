@@ -17,7 +17,7 @@ async function loadUnsentEmails(sheetLink) {
       keyFile: path.join(
         __dirname,
         "..",
-        "youtube-comments-468405-69c215cd5075.json"
+        "youtube-comments-468405-69c215cd5075.json",
       ),
       scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
     });
