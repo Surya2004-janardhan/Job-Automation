@@ -46,7 +46,7 @@ jobs:
       - name: Run LinkedIn Outreach
         id: linkedin
         run: |
-          cd inb
+          cd linkedin-automation
           python linkedin_outreach.py \
             --cookie "${{ secrets.LINKEDIN_COOKIE }}" \
             --excel "linkedin-data.xlsx" \
@@ -61,8 +61,8 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add inb/linkedin-data.xlsx
-          [ -f inb/linkedin_quota.json ] && git add inb/linkedin_quota.json || echo "No quota file to add"
+          git add linkedin-automation/linkedin-data.xlsx
+          [ -f linkedin-automation/linkedin_quota.json ] && git add linkedin-automation/linkedin_quota.json || echo "No quota file to add"
           git commit -m "Update LinkedIn status - $(date +%Y-%m-%d)" || echo "No changes to commit"
           git push || echo "No changes to push"
 
@@ -73,8 +73,8 @@ jobs:
           const nodemailer = require('nodemailer');
           const fs = require('fs');
 
-          const output = fs.existsSync('inb/linkedin_output.txt') 
-            ? fs.readFileSync('inb/linkedin_output.txt', 'utf8').slice(-3000) 
+          const output = fs.existsSync('linkedin-automation/linkedin_output.txt') 
+            ? fs.readFileSync('linkedin-automation/linkedin_output.txt', 'utf8').slice(-3000) 
             : 'No output captured';
 
           const transporter = nodemailer.createTransport({
@@ -104,8 +104,8 @@ jobs:
           const nodemailer = require('nodemailer');
           const fs = require('fs');
 
-          const output = fs.existsSync('inb/linkedin_output.txt') 
-            ? fs.readFileSync('inb/linkedin_output.txt', 'utf8').slice(-3000) 
+          const output = fs.existsSync('linkedin-automation/linkedin_output.txt') 
+            ? fs.readFileSync('linkedin-automation/linkedin_output.txt', 'utf8').slice(-3000) 
             : 'No output captured';
 
           const transporter = nodemailer.createTransport({

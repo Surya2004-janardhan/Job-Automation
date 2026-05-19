@@ -18,7 +18,7 @@ echo ""
 # Check if we're in the right directory
 if [ ! -f "linkedin_outreach.py" ]; then
     echo -e "${RED}❌ Error: linkedin_outreach.py not found${NC}"
-    echo "   Please run this script from the inb/ directory"
+    echo "   Please run this script from the linkedin-automation/ directory"
     exit 1
 fi
 

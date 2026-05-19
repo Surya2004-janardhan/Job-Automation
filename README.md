@@ -11,24 +11,24 @@ The goal is simple: save manual effort and keep your applications moving every d
 
 ## What This Project Does
 
-### 1) Email Campaign (`src/index.js`)
+### 1) Email Campaign (`email-automation/src/index.js`)
 - Reads unsent contacts from Google Sheets.
-- Generates subject/body variants using Groq.
+- Generates cold-email subject/body variants using Groq AI.
 - Sends emails in batches via Gmail SMTP.
 - Marks sent rows in the sheet.
 
-### 2) Delivery Verification (`scripts/phase5.js`)
+### 2) Delivery Verification (`email-automation/scripts/phase5.js`)
 - Checks sent emails and bounce notifications using IMAP.
 - Detects failed deliveries.
 - Writes failure reasons back to Google Sheets.
 - Sends a summary report email.
 
-### 3) LinkedIn Outreach (`inb/linkedin_outreach.py`)
+### 3) LinkedIn Outreach (`linkedin-automation/linkedin_outreach.py`)
 - Uses LinkedIn cookie auth.
 - Sends connection messages with controlled limits.
 - Tracks status in Excel.
 
-### 4) Daily Job Hunter (`daily-job-hunter/index.js`)
+### 4) Daily Job Hunter (`web-job-hunter/index.js`)
 - Reads company domains from your target sheet.
 - Scrapes careers/job pages aggressively.
 - Filters jobs for:
@@ -48,22 +48,22 @@ The goal is simple: save manual effort and keep your applications moving every d
 ## Project Structure
 
 ```text
-src/
+email-automation/
   index.js                      # Main email campaign orchestrator
 
-scripts/
-  phase1.js                     # Load unsent rows from Sheets
-  phase2.js                     # Batch preparation
-  phase3.js                     # Send batch emails
-  phase4.js                     # Update sent status in Sheets
-  phase5.js                     # Bounce/error verification
-  llm.js                        # Groq subject/body variation
+  email-automation/scripts/
+    phase1.js                   # Load unsent rows from Sheets
+    phase2.js                   # Batch preparation
+    phase3.js                   # Send batch emails
+    phase4.js                   # Update sent status in Sheets
+    phase5.js                   # Bounce/error verification
+    llm.js                      # Groq subject/body variation
 
-daily-job-hunter/
+web-job-hunter/
   index.js                      # Daily fresher job scraping + mail
   README.md
 
-inb/
+linkedin-automation/
   linkedin_outreach.py          # LinkedIn automation
   linkedin-data.xlsx
 
@@ -84,7 +84,7 @@ inb/
 
 ## Environment Setup
 
-Create `.env` at repo root:
+Create `.env` in the relevant app folder:
 
 ```env
 EMAIL_USER=your_gmail@gmail.com
@@ -101,9 +101,10 @@ MAX_RUN_MINUTES=120
 JOB_HUNTER_DRY_RUN=0
 ```
 
-Place your Google service account file in root:
+Place the Google service account JSON where each app expects it:
 
 ```text
+email-automation/seismic-rarity-468405-j1-cd12fe29c298.json
 seismic-rarity-468405-j1-cd12fe29c298.json
 ```
 
@@ -112,7 +113,8 @@ Share the Google Sheet(s) with the service account email.
 ## Install
 
 ```bash
-npm install
+cd email-automation && npm ci
+cd ../web-job-hunter && npm install
 ```
 
 ## Local Usage
@@ -120,25 +122,27 @@ npm install
 ### Run email campaign
 
 ```bash
-npm start
+cd email-automation && npm start
 ```
+
+This flow uses AI to generate multiple cold-email subject lines and body variants before sending.
 
 ### Verify delivery status
 
 ```bash
-npm run verify
+cd email-automation && npm run verify
 ```
 
 ### Run daily job hunter manually
 
 ```bash
-node daily-job-hunter/index.js
+node web-job-hunter/index.js
 ```
 
 ### Run LinkedIn outreach manually
 
 ```bash
-cd inb
+cd linkedin-automation
 pip install selenium pandas openpyxl
 python linkedin_outreach.py --cookie "YOUR_LI_AT_COOKIE" --limit 5
 ```

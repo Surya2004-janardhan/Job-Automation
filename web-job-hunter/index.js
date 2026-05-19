@@ -902,6 +902,6 @@ async function run() {
 }
 
 run().catch((err) => {
-  console.error("daily-job-hunter failed:", err.message);
+  console.error("web-job-hunter failed:", err.message);
   process.exit(1);
 });

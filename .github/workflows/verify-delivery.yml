@@ -20,23 +20,28 @@ jobs:
         with:
           node-version: "18"
           cache: "npm"
+          cache-dependency-path: email-automation/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          cd email-automation
+          npm ci
 
       - name: Install additional dependencies for IMAP
-        run: npm install imap mailparser
+        run: |
+          cd email-automation
+          npm install --no-save imap mailparser
 
       - name: Create service account JSON file
         run: |
-          cat > seismic-rarity-468405-j1-cd12fe29c298.json << 'EOF'
+          cat > email-automation/seismic-rarity-468405-j1-cd12fe29c298.json << 'EOF'
           ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           EOF
 
       - name: Create .env file
         run: |
-          echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" > .env
-          echo "EMAIL_PASS=${{ secrets.EMAIL_PASS }}" >> .env
+          echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" > email-automation/.env
+          echo "EMAIL_PASS=${{ secrets.EMAIL_PASS }}" >> email-automation/.env
 
       - name: Wait for bounce notifications to arrive
         run: |
@@ -44,7 +49,9 @@ jobs:
           echo "This allows time for mail servers to process and return bounces."
 
       - name: Verify email delivery status
-        run: node scripts/phase5.js
+        run: |
+          cd email-automation
+          node scripts/phase5.js
 
       - name: Commit and push any changes
         run: |

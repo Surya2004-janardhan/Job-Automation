@@ -1,4 +1,4 @@
-# Daily Job Hunter
+# Web Job Hunter
 
 Isolated automation module that:
 
@@ -12,7 +12,7 @@ Isolated automation module that:
 ## Run locally
 
 ```bash
-node daily-job-hunter/index.js
+node index.js
 ```
 
 ## Optional env vars
